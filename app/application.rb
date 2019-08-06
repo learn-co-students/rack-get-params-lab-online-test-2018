@@ -1,6 +1,6 @@
 class Application
-  @@items = %w[Apples Carrots Pears]
-  @@cart = []
+  @@items = %w[Apples Carrots Pears Figs]
+  @@cart = %w[Figs]
   def call(env)
     resp = Rack::Response.new
     req = Rack::Request.new(env)
@@ -14,7 +14,8 @@ class Application
     when '/cart'
       resp.write parse_cart(resp)
     when '/add'
-      add_to_cart
+      item = req.params['item']
+      resp.write check_item(item)
     else
       resp.write 'Path Not Found'
     end
@@ -36,5 +37,16 @@ class Application
     else
       resp.write 'Your cart is empty'
     end
+  end
+  def check_item(item)
+    if @@items.include?(item)
+      add_item(item)
+      "added #{item}"
+    else
+      "We don't have that item"
+    end
+  end
+  def add_item(item)
+    @@cart << item
   end
 end
